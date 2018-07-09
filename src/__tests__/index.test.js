@@ -21,6 +21,12 @@ const IF_OF_LAST_CHILD_OF_NODE_WITH_CHILDREN = "ertf"
 const SAMPLE_OF_ORDERED_SIBLINGS = ["lfrg", "ertf"]
 const SAMPLE_OF_PARENT_AND_SIBLINGS = { parentId: "wqsa", childrenIds: ["lfrg", "ertf"] }
 const SAMPLE_OF_PARENTAL_BRANCH = { nodeId: 'dfre', branchIds: ["wqsa", "ertf"] }
+const TARGET_FOR_SAMPLE_BRANCH = "ertf"
+const LAST_CHILD_OF_SAMPLE_BRANCH = "dfre"
+const SAMPLE_BRANCH = [
+  { id: 'aaaa', parent: null, nextSibling: 'bbbb' },
+  { id: 'cccc', parent: 'aaaa', nextSibling: 'dddd' }
+]
 
 test('should have defined FDS', () => {
   expect(fds).toBeDefined()
@@ -203,6 +209,50 @@ describe('getParentalBranch', () => {
     branch.map((node, index) => {
       expect(node.id).toBe(SAMPLE_OF_PARENTAL_BRANCH.branchIds[index])
     })
+  })
+
+})
+
+//  TODO: might want to cover this one a bit more
+describe('copyBranchAtTheEndOf', () => {
+
+  let branch
+
+  beforeEach(() => {
+    branch = fds.copyBranchAtTheEndOf(SAMPLE_BRANCH, TARGET_FOR_SAMPLE_BRANCH)
+  })
+
+  test('should set the parent on the first node in the branch', () => {
+    expect(branch[0].parent).toBe(TARGET_FOR_SAMPLE_BRANCH)
+  })
+
+  test('should set new id for each node in branch', () => {
+    SAMPLE_BRANCH.map((node, index) => {
+      expect(node.id).not.toBe(branch[index].id)
+    })
+  })
+
+  test('should be referred to by the previously last node', () => {
+    expect(fds.getNode(LAST_CHILD_OF_SAMPLE_BRANCH).nextSibling).toBe(branch[0].id)
+  })
+
+  test('should place the nodes at the end', () => {
+    branch.map(node => expect(node.nextSibling).toBeNull())
+  })
+
+})
+
+//  TODO: cover this one a bit more
+describe('toArrayStructure', () => {
+
+  let arrayStructure
+
+  beforeEach(() => {
+    arrayStructure = fds.toArrayStructure()
+  })
+
+  test('should return an array', () => {
+    expect(Array.isArray(arrayStructure)).toBe(true)
   })
 
 })
