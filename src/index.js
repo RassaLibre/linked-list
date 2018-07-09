@@ -135,12 +135,22 @@ export default class FlatDocumentStructure{
   copyBranchAtTheEndOf(branch, parentId){
     if(!this.document[parentId]) return null
     if(!branch.length) return []
-    const lastChildren = this.getLastChildOfParent(parentId)
+    let lastChildOfPrevLevel = this.document[parentId]
     return branch.map((node, i) => {
       const newId = this._getUniqueKey()
-      if(i === 0 && lastChildren)
-        this.document[lastChildren.id] = { ...lastChildren, nextSibling: newId }
-      this.document[newId] = { ...node, id: newId, parent: (i === 0) ? parentId : node.parent }
+      if(lastChildOfPrevLevel){
+        const lastChild = this.getLastChildOfParent(lastChildOfPrevLevel.id)
+        if(lastChild){
+          this.document[lastChild.id] = { ...lastChild, nextSibling: newId }
+          lastChildOfPrevLevel = this.document[lastChild.id]
+        } else lastChildOfPrevLevel = null
+      }
+      this.document[newId] = {
+        ...node,
+        id: newId,
+        nextSibling: null,
+        parent: (i === 0) ? parentId : node.parent
+      }
       return this.document[newId]
     })
   }
