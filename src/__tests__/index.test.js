@@ -15,6 +15,9 @@ beforeEach(() => {
 
 })
 
+
+
+
 const ID_OF_NODE_WITH_CHILDREN = "wqsa"
 const ID_OF_FIRST_CHILD_OF_NODE_WITH_CHILDREN = "lfrg"
 const IF_OF_LAST_CHILD_OF_NODE_WITH_CHILDREN = "ertf"
@@ -27,6 +30,8 @@ const SAMPLE_BRANCH = [
   { id: 'aaaa', parent: null, nextSibling: 'bbbb' },
   { id: 'cccc', parent: 'aaaa', nextSibling: 'dddd' }
 ]
+const NODE_TO_REMOVED = 'wqsa'
+const NODES_TO_BE_REMOVED_WITH_REMOVED_NODE = ["lfrg", "ertf", "dfre"]
 
 test('should have defined FDS', () => {
   expect(fds).toBeDefined()
@@ -242,6 +247,33 @@ describe('copyBranchAtTheEndOf', () => {
 
 })
 
+describe('removeNode', () => {
+
+  let removedNode
+
+  beforeEach(() => {
+    removedNode = fds.removeNode(NODE_TO_REMOVED)
+  })
+
+  test('should remove passed node', () => {
+    expect(fds.getNode(NODE_TO_REMOVED)).toBeUndefined()
+  })
+
+  test('should remove all its children', () => {
+    NODES_TO_BE_REMOVED_WITH_REMOVED_NODE
+      .map(node => expect(fds.getNode(node)).toBeUndefined())
+  })
+
+  test('should remove any reference to the removed node', () => {
+    Object.values(fds.getDocument()).map(node => {
+      expect(node.parent).not.toBe(NODE_TO_REMOVED)
+      expect(node.nextSibling).not.toBe(NODE_TO_REMOVED)
+    })
+  })
+
+})
+
+
 //  TODO: cover this one a bit more
 describe('toArrayStructure', () => {
 
@@ -256,4 +288,3 @@ describe('toArrayStructure', () => {
   })
 
 })
-
