@@ -76,6 +76,13 @@ export default class FlatDocumentStructure{
     return siblings.find(node => node.nextSibling === nodeId)
   }
 
+  //String, [Node] => Node
+  getNextNode(nodeId, siblings = Object.values(this.document)){
+    if(!this.document[nodeId]) return null
+    const node = this.document[nodeId]
+    return this.document[node.nextSibling]
+  }
+
   // Node, String => ?Node
   addNodeAtTheEnd(node, parent){
     if(!this.document[parent]) return null
@@ -155,6 +162,7 @@ export default class FlatDocumentStructure{
     })
   }
 
+  // String => null
   removeNode(id){
     if(!this.document[id]) return null
     const node = this.document[id]
@@ -162,14 +170,22 @@ export default class FlatDocumentStructure{
     if(!node.nextSibling){
       const prev = this.getPreviousNode(id)
       if(prev) this.document[prev.id] = { ...prev, nextSibling: null }
+    } else {
+      const prev = this.getPreviousNode(id)
+      const next = this.getNode(node.nextSibling)
+      this.document[prev.id] = { ...prev, nextSibling: next.id }
     }
     //  remove children
-    const children = this.getChildrenOf(id)
-    children.map(child => this.removeNode(id))
+    let children = [...this.getChildrenOf(id)]
+    for(let i = 0; i < children.length; i++){
+      children = [...children, ...this.getChildrenOf(children[i].id)]
+      delete this.document[children[i].id]
+    }
     //  remove the actual node
     delete this.document[id]
   }
 
+  // [Nodes] => [Nodes]
   toArrayStructure(nodes){
     if(!nodes)
       nodes = this.getTopLevelNodes()
