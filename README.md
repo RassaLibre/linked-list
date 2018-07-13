@@ -151,3 +151,7 @@ If no nodes are passed, the function returns the entire document.
 
 	toArrayStructure(nodes)
 
+### Order nodes
+Returns the entire document with ordered notes based on the position in the hierarchy.
+
+	orderDocument()
